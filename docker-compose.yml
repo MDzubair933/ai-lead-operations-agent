@@ -1,0 +1,65 @@
+services:
+  app-postgres:
+    image: postgres:16-alpine
+    container_name: lead_ops_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lead_ops}
+      POSTGRES_USER: ${POSTGRES_USER:-lead_ops_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_in_production}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lead_ops_user} -d ${POSTGRES_DB:-lead_ops}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lead_ops_network
+
+  app-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lead_ops_backend
+    restart: unless-stopped
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-lead_ops_user}:${POSTGRES_PASSWORD:-change_in_production}@app-postgres:5432/${POSTGRES_DB:-lead_ops}
+      API_SECRET_KEY: ${API_SECRET_KEY}
+      WEBHOOK_HMAC_SECRET: ${WEBHOOK_HMAC_SECRET}
+      N8N_BASE_URL: ${N8N_BASE_URL:-https://n8n.example.com}
+      N8N_QUALIFICATION_WEBHOOK_PATH: ${N8N_QUALIFICATION_WEBHOOK_PATH:-/webhook/lead-qualification}
+      ENABLE_EXTERNAL_OUTREACH: "false"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - lead_ops_network
+
+  app-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lead_ops_frontend
+    restart: unless-stopped
+    depends_on:
+      - app-backend
+    ports:
+      - "8080:80"
+    networks:
+      - lead_ops_network
+
+networks:
+  lead_ops_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

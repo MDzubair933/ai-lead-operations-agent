@@ -1,0 +1,9 @@
+Company Name,Contact Name,Email,Website,Source,Notes
+Acme Corp,Alice Smith,alice@acme.com,https://acme.com,outbound_campaign,Interested in enterprise automation and n8n webhook processing.
+CyberDynamics Inc,Bob Miller,bob@cyberdynamics.io,https://cyberdynamics.io,referral,Looking to integrate automated lead scoring.
+Apex Logistics,Clara Oswald,clara@apexlogistics.com,https://apexlogistics.com,inbound_demo,Needs autonomous lead operations platform.
+Acme Corp,Alice Smith,alice@acme.com,https://acme.com,outbound_campaign,Duplicate of first lead in batch.
+,David Tennant,david@example.com,https://example.com,csv_import,Row missing company name.
+Stellar AI,,info@stellarai.dev,https://stellarai.dev,csv_import,Row missing contact name.
+Nova Cloud Systems,Fiona Gallagher,invalid-email-format,https://novacloud.org,partner,Row with syntactically invalid email.
+Orbit Labs,Gregory House,greg@orbitlabs.tech,https://orbitlabs.tech,trade_show,Evaluating AI qualification agent for sales team.
